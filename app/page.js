@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Form from "./form";
 
 function page() {
@@ -9,12 +9,30 @@ function page() {
 
 function TaskPage() {
   const [taskClick, setTaskClick] = useState(false);
+  const formRef = useRef(null);
 
+  const handleOutsideClick = (e) => {
+    if (formRef.current && !formRef.current.contains(e.target)) {
+      setTaskClick(false);
+    }
+  };
+  useEffect(() => {
+    if (taskClick) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [taskClick]);
   function createTask(e) {
     e.preventDefault();
     setTaskClick(true);
   }
-  if (taskClick) return <Form />;
+
+  if (taskClick) return <Form ref={formRef} />;
+
   return (
     <div>
       <button
