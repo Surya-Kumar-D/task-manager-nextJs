@@ -1,9 +1,10 @@
 /* eslint-disable react/display-name */
+"use client";
 import { useForm } from "react-hook-form";
 import React, { useState } from "react";
 import TaskIcon from "@mui/icons-material/Task";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
-
+import { insertTask } from "./services/apiTasks";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Task from "@mui/icons-material/Task";
@@ -11,7 +12,11 @@ import KeyboardBackspace from "@mui/icons-material/KeyboardBackspace";
 import { set } from "date-fns";
 import useStore from "./store";
 
-const Form = React.forwardRef(({ inputRef }, ref) => {
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+
+const Form = React.forwardRef(({ inputRef, closeForm }, ref) => {
+  const queryClient = useQueryClient();
   const [personName, setPersonName] = useState("");
   const [personRole, setPersonRole] = useState("");
   const [assignerName, setAssignerName] = useState("");
@@ -22,8 +27,20 @@ const Form = React.forwardRef(({ inputRef }, ref) => {
   const { register, handleSubmit, setValue, reset } = useForm();
   const tasks = useStore((state) => state.tasks);
   const addTask = useStore((state) => state.addTask);
+  const { mutate, isLoading } = useMutation({
+    mutationFn: insertTask,
+    onSuccess: (data) => {
+      toast.success("Task added successfully");
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      reset();
+      closeForm();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const onSubmit = (data) => {
-    addTask(data);
+    mutate(data);
     reset();
   };
   console.log(tasks);
