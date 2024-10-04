@@ -178,7 +178,10 @@ const Form = React.forwardRef(({ inputRef, closeForm }, ref) => {
         </div>
       </div>
       <div className="w-[100%] p-[10px] gap-[50px] flex justify-around items-center">
-        <button className="w-1/3 text-center inline-block   bg-[#87CEEB] p-[10px] rounded-md">
+        <button
+          onClick={() => closeForm()}
+          className="w-1/3 text-center inline-block   bg-[#87CEEB] p-[10px] rounded-md"
+        >
           <KeyboardBackspace /> Back
         </button>
         <button
